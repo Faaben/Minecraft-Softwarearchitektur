@@ -54,10 +54,125 @@ Minecraft fördert damit Kreativität, Problemlösung und Zusammenarbeit.
 - Server dürfen betrieben werden, solange sie die Minecraft Server Guidelines einhalten (kein Pay-to-Win, keine unerlaubte Markenverwendung).
 
 ## 3. Kontextabgrenzung
-Kontextdiagramm + Beschreibung.
+### Ziel des Kontextdiagramms
+Das Kontextdiagramm zeigt die äußeren Akteure, Systeme und Schnittstellen, die mit Minecraft interagieren.
+Es dient dazu, die Abgrenzung zwischen dem System (Minecraft selbst) und der Umgebung (Nutzer, Plattformen, externe Dienste) klar darzustellen.
+
+### Beschreibung des Systemkontexts
+#### Systemgrenze
+Das betrachtete System ist die Minecraft-Anwendung (Client und Server).
+Innerhalb dieser Grenze liegen:
+- Spiellogik
+- Weltgenerierung und Rendering
+- Kommunikationsschnittstellen zwischen Client und Server
+- Persistente Datenspeicherung (Welt- und Spielerdaten)
+Außerhalb der Grenze befinden sich alle externen Akteure und Systeme, die mit Minecraft interagieren.
+---
+
+#### Externe Akteure und Systeme
+Akteur / System  
+Spieler Client)
+  - Beschreibung: Endbenutzer, die Minecraft auf PC, Konsole oder Mobilgerät spielen.
+  - Interaktion mit Minecraft: Interagieren mit der Spielwelt über Tastatur, Maus oder Controller; senden Befehle an den Server.
+
+Multiplayer-Server
+  - Beschreibung: Server, auf dem die Spielwelt und Spielregeln zentral laufen.
+  - Interaktion mit Minecraft: Empfängt Spieleraktionen, synchronisiert Zustände und verwaltet Spielregeln.
+
+Minecraft Launcher / Plattform
+  - Beschreibung: Offizielle Distributionsplattform für das Spiel (Login, Updates, Lizenzprüfung).
+  - Interaktion mit Minecraft: Startet die Anwendung, prüft Benutzeridentität und lädt Updates.
+
+Microsoft Account / Xbox Live Services
+  - Beschreibung: Authentifizierungs- und Cloud-Dienst.
+  - Interaktion mit Minecraft: Ermöglicht Login, Freundeslisten, Multiplayer- und Marketplace-Funktionen.
+
+Modding-Plattformen (Forge, Fabric, Add-ons)
+  - Beschreibung: Frameworks und Tools für die Community-Erweiterungen.
+  - Interaktion mit Minecraft: Stellen Schnittstellen bereit, um Spielinhalte und Logik zu verändern.
+
+Ressourcenserver / Marketplace
+  - Beschreibung: Offizielle Quelle für Skins, Welten, Add-ons.
+  - Interaktion mit Minecraft: Download und Lizenzprüfung von Inhalten.
+
+Bildungsplattform (Minecraft Education)
+  - Beschreibung: Variante für Schulen und Unterricht.
+  - Interaktion mit Minecraft: Interagiert mit Lernplattformen und Lehrerkonten.
+---
+
+#### Beschreibung der Umgebung
+
+Minecraft befindet sich in einem ökosystemartigen Umfeld aus Clients, Servern und Community-Plattformen.  
+Die wesentlichen Kommunikationsflüsse sind:
+
+1. Spieler ↔ Server: Aktionen und Ereignisse werden in Echtzeit über TCP/IP synchronisiert.
+
+2. Client ↔ Launcher: Authentifizierung, Versionsverwaltung, Startparameter.
+
+3. Server ↔ Datenhaltung: Speicherung der Welt (Chunks, Spielerinventar, Fortschritt).
+
+4. Server ↔ Modding-Schnittstellen: Integration von Community-Erweiterungen.
+
+5. Client ↔ Microsoft Services: Online-Login, Multiplayer, Cloud-Speicherung, Marketplace-Zugriff.
+
+
+#### Visuelle Struktur (für späteres Diagramm)
+Wenn ihr das Diagramm erstellt, sollte es ungefähr so aufgebaut sein:
+
+```text
+      +-------------------------+ 
+      | Microsoft/Xbox Services |
+      +-----------+-------------+
+                  |
+                  v
+     +---------------------------------+
+     |       Minecraft Launcher        |
+     +---------------------------------+
+                  |
+                  v
+   +--------------------------------------+
+   |           Minecraft Client           |
+   +--------------------------------------+
+          |                    |
+          | Multiplayer (TCP/IP)|
+          v                    v
+   +--------------------------------------+
+   |          Minecraft Server            |
+   +--------------------------------------+
+          |                    |
+          | Modding API        | Datenhaltung
+          v                    v
+   +-------------+     +-------------------+
+   | Forge/Fabric|     | NBT Save Files    |
+   +-------------+     +-------------------+
+
+```
+
+
+
+
+
 
 ## 4. Lösungsstrategie
-Wichtige Architekturentscheidungen (Frontend, Backend, Cloud, Schnittstellen).
+###Architekturgrundidee
+
+Minecraft verfolgt eine Client-Server-Architektur, die es erlaubt, sowohl Einzelspieler- als auch Mehrspielersitzungen zu betreiben.
+Dabei gilt das Prinzip:
+- Der Server bestimmt die Spielrealität, der Client visualisiert sie.
+
+Diese klare Trennung ermöglicht:
+- Multiplayer über Netzwerk (lokal oder online)
+- Modulare Erweiterungen durch Plugins oder Mods
+- Stabilen Betrieb, auch wenn einzelne Clients abstürzen
+
+
+
+
+
+
+
+
+
 
 ## 5. Bausteinsicht
 Anwendungsfalldiagramm + Beschreibung.
