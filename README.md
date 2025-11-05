@@ -371,34 +371,5 @@ Jede Anforderung wird mit einem Ziel, einer Begründung und einer Maßnahme besc
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## 9. Risiken und technische Schulden
-(Optional, falls vom Dozenten gewünscht).
-
-## 10. Anhänge
+## 9. Anhänge
 Links, Quellen, GitHub-Workflows.
