@@ -1,0 +1,47 @@
+@startuml verteilung
+title Minecraft – Verteilungsdiagramm (Deployment)
+
+left to right direction
+skinparam linetype ortho
+skinparam shadowing false
+
+' Knoten: Client-Umgebung
+node "Client-Gerät" as ClientDevice {
+  node "Desktop (Windows/macOS/Linux)" as Desktop {
+    artifact "Minecraft Client\n(Java Edition)" as ClientJava
+    artifact "Java Runtime (JRE)" as JRE
+    ClientJava -[hidden]-> JRE
+  }
+
+  node "Konsole / Mobil" as ConsoleMobile {
+    artifact "Minecraft Client\n(Bedrock Edition)" as ClientBedrock
+    artifact "C++ Runtime /\nPlatform SDK" as CPP
+    ClientBedrock -[hidden]-> CPP
+  }
+
+  node "Minecraft Launcher / Plattform" as Launcher
+}
+
+' Knoten: Server-Umgebung
+node "Server-Host" as ServerHost {
+  node "Minecraft Server" as Server {
+    database "Welt- & Spielerdaten\n(NBT, Chunks)" as Daten
+  }
+}
+
+' Externe Dienste
+cloud "Microsoft Account /\nXbox Live Services" as Xbox
+cloud "Ressourcenserver /\nMarketplace" as Market
+node "Modding-Plattformen\n(Forge, Fabric, Add-ons)" as Modding
+
+' Verbindungen
+ClientJava --[thickness=2] Server : TCP/IP
+ClientBedrock --[thickness=2] Server : TCP/IP
+Launcher --> ClientJava : Installation / Updates / Start
+ClientJava --> Xbox : Authentifizierung / Multiplayer
+ClientBedrock --> Xbox : Authentifizierung / Multiplayer
+ClientJava --> Market : Inhalte (Skins, Welten, Add-ons)
+Server --> Daten : Persistenz
+Modding --> Server : Plugins / Erweiterungen
+
+@enduml

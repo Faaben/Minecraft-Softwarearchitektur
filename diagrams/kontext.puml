@@ -1,0 +1,34 @@
+@startuml kontext
+title Minecraft - Kontextdiagramm (Systemgrenze: Client + Server)
+
+skinparam componentStyle rectangle
+skinparam linetype ortho
+skinparam shadowing false
+left to right direction
+
+actor "Spieler (Client)" as Spieler
+
+rectangle "Minecraft (Client + Server)" as System {
+  component "Minecraft Client" as Client
+  component "Minecraft Server" as Server
+  database "Persistente Daten\n(NBT Save Files)" as Daten
+
+  Client -[#DarkGray,dashed]> Server : TCP/IP\nMultiplayer
+  Server --> Daten : Speichern / Laden
+}
+
+cloud "Minecraft Launcher /\nPlattform" as Launcher
+cloud "Microsoft Account /\nXbox Live Services" as MS
+cloud "Ressourcenserver /\nMarketplace" as Market
+node "Modding-Plattformen\n(Forge, Fabric, Add-ons)" as Modding
+folder "Bildungsplattform\n(Minecraft Education)" as Edu
+
+Spieler --> Client : Eingaben, Befehle
+Launcher --> Client : Start, Auth, Updates
+Client <--> MS : Login, Freunde, Multiplayer
+Client --> Market : Inhalte (Downloads)
+Modding <--> Server : Plugins, APIs
+Edu <--> Client : Unterrichtsfunktionen
+
+@enduml
+

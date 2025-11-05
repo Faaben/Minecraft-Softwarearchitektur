@@ -80,6 +80,11 @@ Außerhalb der Grenze befinden sich alle externen Akteure und Systeme, die mit M
 | **Bildungsplattform (Minecraft Education)**      | Variante für Schulen und Unterricht.                                             | Interagiert mit Lernplattformen und Lehrerkonten.                                                 |
 
 ---
+#### Kontextdiagramm der Anwendung
+
+![Kontextdiagramm](diagrams/kontext.png)
+
+---
 
 #### Beschreibung der Umgebung
 
@@ -202,6 +207,11 @@ Minecraft besteht aus fünf zentralen Bausteinen, die zusammen das Gesamtsystem 
 | **4. Netzwerkkommunikation** | Verbindung zwischen Client und Server                      | - Realisiert das Client-Server-Protokoll<br>- Überträgt Zustände, Bewegungen und Ereignisse<br>- Gewährleistet Datenkonsistenz über TCP/IP<br>- Fehlererkennung und Paketwiederholung |
 | **5. Modding-System / API**  | Erweiterbarkeit und Anpassbarkeit der Anwendung            | - Bereitstellung von Schnittstellen für Mods und Plugins<br>- Erlaubt server- und clientseitige Erweiterungen<br>- Unterstützt Frameworks wie Forge, Fabric oder Bedrock Add-ons      |
 
+
+### Anwendungsfalldiagramm
+![Anwendungsfalldiagramm](diagrams/anwendungsfaelle.png)
+
+
 ### Zusammenspiel der Komponenten
 1. Client sendet Benutzereingaben (z. B. Bewegung, Aktionen) an den Server.
 2. Server verarbeitet diese Ereignisse, prüft sie auf Gültigkeit und aktualisiert den Weltzustand.
@@ -307,6 +317,8 @@ Das Verteilungsdiagramm sollte den Aufbau etwa so darstellen:
 - Server ↔ Datenhaltung: Speicherung der Weltdateien, Backups, Logs.
 - Server ↔ Modding-System: Zugriff auf Mod-Plugins, Event Hooks, Konfiguration.
 
+### Anwendungsfalldiagramm
+![Verteildiagramm](diagrams/verteilung.png)
 
 
 

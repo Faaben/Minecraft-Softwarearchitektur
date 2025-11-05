@@ -1,0 +1,49 @@
+@startuml anwendungsfaelle
+title Minecraft – Anwendungsfalldiagramm (Systemgrenze: Client + Server)
+
+left to right direction
+skinparam shadowing false
+
+actor "Spieler" as Spieler
+actor "Lehrperson" as Lehrperson
+actor "Mod-Entwickler" as ModEntwickler
+actor "<<System>> Microsoft/Xbox\nServices" as Auth
+actor "<<System>> Ressourcenserver/\nMarketplace" as Market
+
+rectangle "Minecraft (Client + Server)" as System {
+  usecase "Welt erkunden" as UCExplore
+  usecase "Ressourcen sammeln" as UCResource
+  usecase "Bauen / Gestalten" as UCBuild
+  usecase "Gegenstände herstellen\n(Crafting)" as UCCraft
+  usecase "Mit Spielern interagieren\n(Chat, Handel)" as UCInteract
+  usecase "Multiplayer-Server beitreten" as UCJoin
+  usecase "Anmelden" as UCLogin
+  usecase "Inhalte herunterladen\n(Skins, Welten, Add-ons)" as UCDownload
+  usecase "Unterrichtsfunktionen verwenden\n(Education)" as UCEdu
+  usecase "Modding-API nutzen" as UCModAPI
+}
+
+Spieler --> UCExplore
+Spieler --> UCResource
+Spieler --> UCBuild
+Spieler --> UCCraft
+Spieler --> UCInteract
+Spieler --> UCJoin
+Spieler --> UCLogin
+Spieler --> UCDownload
+Spieler --> UCModAPI
+
+Lehrperson --> UCEdu
+Lehrperson --> UCLogin
+
+ModEntwickler --> UCModAPI
+
+Auth --> UCLogin
+Market --> UCDownload
+
+UCJoin .> UCLogin
+UCDownload .> UCLogin
+UCCraft .> UCResource
+UCBuild .> UCResource
+
+@enduml
