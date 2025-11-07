@@ -381,7 +381,14 @@ Jede Anforderung wird mit einem Ziel, einer Begründung und einer Maßnahme besc
 
 
 
-
-
 ## 9. Anhänge
 Links, Quellen, GitHub-Workflows.
+
+---
+
+© 2025 – Gruppenarbeit Architektur Minecraft  
+Autorengruppe: *Fabian, Teo, Eldin, Thomas*  
+Schule: *Feusi Bildungszentrum*  
+Dozent: *Björn Michels*  
+Abgabedatum: 16.11.2025  
+Präsentation: 19.11.2025
