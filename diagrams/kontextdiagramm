@@ -1,0 +1,27 @@
+flowchart LR
+    %% --- Umfeld (extern) ---
+    subgraph Umfeld
+      Spieler([Spieler])
+      Admin([Server-Admin])
+      Auth[(Microsoft/Xbox Live Auth)]
+      Content[(Launcher-/Update-/Content-Server)]
+      ModRepo[(Mod-/Plugin-Repositorien)]
+    end
+
+    %% --- System im Fokus ---
+    subgraph System
+      Minecraft["Minecraft (Client)"]
+    end
+
+    %% --- Weitere externe Systeme ---
+    Speicher[(Lokales Dateisystem<br/>Welten, Saves, Settings, Resourcepacks)]
+    Server[(Minecraft-Server<br/>Vanilla/Bukkit, Port 25565)]
+
+    %% --- Beziehungen ---
+    Spieler -->|UI/Steuerung| Minecraft
+    Minecraft -->|Login/Lizenz| Auth
+    Minecraft -->|Versionen/Ressourcen| Content
+    Minecraft -->|Singleplayer: IO| Speicher
+    Minecraft <-->|Multiplayer: TCP/Spiel-Events| Server
+    Server -->|Plugins/Mods beziehen| ModRepo
+    Admin -->|Konfiguration/OPS| Server
