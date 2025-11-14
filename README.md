@@ -1,394 +1,553 @@
-# Minecraft-Softwarearchitektur
-Gruppenarbeit Wirtschaftsinformatiker
+# arc42 Architektur-Dokumentation  
+## Minecraft – Referenzarchitektur (didaktisches Modell)
 
-# Architektur-Dokumentation
+**Hinweis**  
+Diese Dokumentation beschreibt Minecraft als abstrahierte Referenzarchitektur auf Basis des arc42-Templates.  
+Sie dient Ausbildungszwecken, fokussiert auf typische Architekturprinzipien und ersetzt keine interne Dokumentation von Mojang/Microsoft.
+
+---
 
 ## 1. Einführung und Ziele
 
-### Beschreibung der Anwendung
-Minecraft ist eine Open-World-Sandbox-Anwendung, in der Benutzer eine virtuelle Welt aus Blöcken erkunden, gestalten und verändern können.
-Das System kombiniert Elemente von Simulation, Kreativität, Überleben und Mehrspieler-Interaktion.
-Minecraft ist in Java (für die Java Edition) bzw. in C++ (für die Bedrock Edition) entwickelt und läuft plattformübergreifend auf Windows, macOS, Linux, Konsolen und Mobilgeräten.
+### 1.1 Beschreibung der Anwendung
 
-### Zweck
-Ziel der Anwendung ist es, den Benutzerinnen und Benutzern eine interaktive, offene Umgebung zu bieten, in der sie eigene Welten erschaffen, Ressourcen sammeln, Gegenstände herstellen und gemeinsam mit anderen Spielern interagieren können.
-Minecraft fördert damit Kreativität, Problemlösung und Zusammenarbeit.
+Minecraft ist eine Open-World-Sandbox-Anwendung, in der Spielerinnen und Spieler eine prozedural generierte, aus Blöcken aufgebaute 3D-Welt erkunden, gestalten und verändern können.  
+Das System kombiniert Elemente von Erkundung, Ressourcenmanagement, überlebensmechaniken, Baün, Automatisierung, Handel, Bildungsszenarien und kompetitivem Spiel.
 
-### Zielgruppe
-- Privatnutzer und Spieler jeder Altersgruppe
-- Lehrpersonen und Schulen, die Minecraft im Unterricht zur Förderung von Teamarbeit, Logik und räumlichem Denken einsetzen
-- Entwicklerinnen und Entwickler, die durch Modding-APIs eigene Erweiterungen oder Server-Plugins implementieren
+Wesentliche Eigenschaften:
 
-### Hauptnutzen
-- Kreative Freiheit: Nutzer gestalten Landschaften, Gebäude und Systeme nach eigenen Ideen.
-- Technische Erweiterbarkeit: Offene Schnittstellen ermöglichen Modifikationen, Plugins und eigene Server.
-- Soziale Interaktion: Multiplayer-Server fördern gemeinsames Spielen und kollaborative Projekte.
-- Lernpotenzial: Minecraft Education Edition unterstützt den Einsatz im Unterricht.
+- Voxelbasierte 3D-Welt mit Blöcken als Grundeinheit
+- Persistente Welten mit Tag-/Nacht-Zyklus, Wetter, Kreaturen (Mobs) und Strukturen
+- Verschiedene Spielmodi (Survival, Creative, Adventure, Spectator, Hardcore)
+- Einzelspieler und Mehrspieler mit gemeinsamen Welten
+- Erweiterbarkeit durch Resource Packs, Datapacks, Mods, Plugins und Add-ons
+
+Technische Basis:
+
+- Minecraft: Java Edition (Java)
+- Minecraft: Bedrock Edition (C++ und plattformspezifische Komponenten)
+- Zielplattformen: Windows, macOS, Linux, Konsolen, Mobile, Education-spezifische Umgebungen
+
+### 1.2 Aufgabenstellung
+
+Die Architektur von Minecraft soll eine langfristig tragfähige Plattform bieten, die:
+
+- sehr grosse, persistente Welten performant und konsistent verwaltet
+- Einzelspieler-, LAN- und Internet-Multiplayer-Szenarien ermöglicht
+- serverseitig autoritative Spiellogik zur Sicherstellung von Fairness und Konsistenz bereitstellt
+- auf unterschiedlichen Plattformen mit variierender Hardware performant betrieben werden kann
+- eine aktive Community aus Mod-Entwicklern, Content Creators und Serverbetreibenden gezielt unterstützt
+- regelmässige Updates, neü Inhalte und Editionsvarianten ermöglicht, ohne bestehende Welten systematisch zu brechen
+
+Diese Referenzarchitektur abstrahiert typische Muster von Java Edition, Bedrock Edition, Realms, Dedicated Servern und Education Edition zu einem einheitlichen, didaktischen Modell.
+
+### 1.3 Qualitätsziele
+
+1. **Performance & Skalierung**  
+   Spielbare Bildraten und stabile Tick-Raten auch bei grossen Welten, vielen Entitäten und mehreren Dutzend bis Hunderten gleichzeitigen Spielenden.
+2. **Stabilität & Datenintegrität**  
+   Hohe Zuverlässigkeit beim Speichern und Laden von Welten und Spielerfortschritten; Minimierung der Gefahr von Datenkorruption.
+3. **Erweiterbarkeit & Offenheit**  
+   Klare Erweiterungspunkte für Mods, Plugins, Datapacks, Resource Packs und Add-ons bei gleichzeitig geschütztem Kern.
+4. **Sicherheit & Fairness**  
+   Schutz vor Cheating, Exploits und unautorisierten Zugriffe durch serverseitige Autorität, Authentifizierung und konfigurierbare Rechte.
+5. **Plattformvielfalt & Konsistenz**  
+   Konsistentes Spielerlebnis über verschiedene Plattformen hinweg, bei gleichzeitiger Optimierung für die jeweilige Zielumgebung.
+6. **Wartbarkeit & Transparenz**  
+   Verständliche Logs, Crash-Reports, Konfigurationsmechanismen und dokumentierte Schnittstellen.
+
+### 1.4 Stakeholder
+
+- Spielende (Casual, Kreativbau, Survival, kompetitiv)
+- Community-Entwicklerinnen und -Entwickler (Mods, Plugins, Tools)
+- Server-Administratoren und Hoster
+- Mojang Studios / Microsoft (Produktverantwortung, Marke, Einnahmen, Compliance)
+- Lehrpersonen und Bildungseinrichtungen (Minecraft Education)
+- Plattformbetreiber (Konsolenhersteller, App-Store-Betreiber)
+
+---
 
 ## 2. Randbedingungen
 
-### Technische Randbedingungen
+### 2.1 Technische Randbedingungen
+
 - Programmiersprachen:
-  - Java für die Minecraft Java Edition (Desktop)
-  - C++ für die Minecraft Bedrock Edition (Cross-Platform)
+  - Java Edition: Java
+  - Bedrock Edition: C++ (Engine-nahe, plattformspezifische Anpassungen)
 - Architektur:
-  Client-Server-Modell mit persistenter Welt. Der Client visualisiert die Spielwelt, während der Server die Spielregeln, Physik und Interaktionen zentral verwaltet.
-- Datenhaltung:
-  Welt- und Spielerdaten werden in Chunks (16×16 Block-Segmente) gespeichert, üblicherweise als NBT-Dateien (Named Binary Tag).
-- Plattformen:
-  Windows, macOS, Linux, iOS, Android, Xbox, PlayStation, Nintendo Switch.
+  - Durchgängiges Client-Server-Modell; im Singleplayer ein lokaler integrierter Serverprozess
+- Persistenz:
+  - Chunk-basierte Speicherung
+  - Binäre, strukturierte Formate (z. B. NBT) für Weltdaten, Spielerprofile, Konfigurationen
 - Netzwerk:
-  Kommunikation über TCP/IP. Multiplayer-Server können öffentlich oder privat gehostet werden.
-- APIs / Modding:
-  Zugriff über Minecraft Forge, Fabric oder Bedrock Add-ons, um neue Spielmechaniken oder Objekte hinzuzufügen.
+  - Proprietäre, paketbasierte Protokolle auf Basis etablierter Transportprotokolle
+- Plattformen:
+  - Desktop, Konsole, Mobile, Education-Umgebungen
+- Distribution:
+  - Minecraft Launcher, Plattform-Stores, Education-Portale, Realms-Verwaltung
 
-### Organisatorische Randbedingungen
-- Entwicklung durch Mojang Studios (gehört zu Microsoft).
-- Versionsverwaltung und Updates werden zentral über Minecraft Launcher bzw. Microsoft Store / Xbox Services verteilt.
-- Community-getriebene Erweiterungen (Mods, Texture Packs, Server) sind essenzieller Bestandteil der Weiterentwicklung.
-- Lizenzmodell: Proprietäre Software mit optionalen Community-Inhalten unter eigenen Nutzungsbedingungen.
+### 2.2 Organisatorische Randbedingungen
 
-### Rechtliche Randbedingungen
-- Urheberrechtlich geschützt (Copyright © Mojang Studios / Microsoft).
-- Nutzung nur gemäß Endbenutzer-Lizenzvertrag (EULA).
-- Server dürfen betrieben werden, solange sie die Minecraft Server Guidelines einhalten (kein Pay-to-Win, keine unerlaubte Markenverwendung).
+- Zentrale Produkt- und Architekturverantwortung bei Mojang/Microsoft
+- Gemeinsame Marken- und Qualitätsanforderungen für alle Editionen
+- Kontinuierliche Weiterentwicklung bei gleichzeitigem Schutz bestehender Welten (Abwärtskompatibilität, Migrationspfade)
+- Starke Einbindung der Community (Feedback, Modding, Serverlandschaft)
+
+### 2.3 Rechtliche Randbedingungen
+
+- Proprietäre Lizenz- und Nutzungsbedingungen (EULA)
+- Markenrichtlinien für Minecraft-bezogene Inhalte und Server
+- Vorgaben für Monetarisierung von Servern und Inhalten
+- Datenschutz- und Compliance-Anforderungen für Online-Dienste
+- Einhaltung plattformspezifischer Richtlinien (z. B. Konsolen, Mobile-Stores)
+
+---
 
 ## 3. Kontextabgrenzung
-### Ziel des Kontextdiagramms
-Das Kontextdiagramm zeigt die äußeren Akteure, Systeme und Schnittstellen, die mit Minecraft interagieren.
-Es dient dazu, die Abgrenzung zwischen dem System (Minecraft selbst) und der Umgebung (Nutzer, Plattformen, externe Dienste) klar darzustellen.
 
-### Beschreibung des Systemkontexts
-#### Systemgrenze
-Das betrachtete System ist die Minecraft-Anwendung (Client und Server).
-Innerhalb dieser Grenze liegen:
-- Spiellogik
-- Weltgenerierung und Rendering
-- Kommunikationsschnittstellen zwischen Client und Server
-- Persistente Datenspeicherung (Welt- und Spielerdaten)
-Außerhalb der Grenze befinden sich alle externen Akteure und Systeme, die mit Minecraft interagieren.
+### 3.1 Systemübersicht
+
+**Im Scope dieser Architekturbetrachtung:**
+
+- Minecraft-Client (Rendering, UI, Eingabe, Client-Netzwerk)
+- Minecraft-Server (integriert, dediziert, Realms, Education-Server)
+- Persistenzschicht (Weltdaten, Spielerprofile, Konfiguration)
+- Offizielle Erweiterungsmechanismen (Resource Packs, Datapacks, Add-ons, APIs)
+
+**Ausserhalb, aber relevant:**
+
+- Microsoft-/Xbox-Accounts und zentrale Authentifizierungsdienste
+- Minecraft Launcher und Plattform-Stores
+- Externe / Community-Server und Hosting-Anbieter
+- Modding- und Plugin-Plattformen von Drittanbietern
+- Education-spezifische Verwaltungsplattformen und Schul-Infrastrukturen
+
+### 3.2 Externe Akteure und Systeme
+
+| Akteur / System                 | Beschreibung                                          | Interaktion                                |
+|---------------------------------|-------------------------------------------------------|--------------------------------------------|
+| Spielende                       | Endnutzerinnen und Endnutzer                         | Spiel, Chat, Einstellungen, Kaüfe         |
+| Launcher / Store                | Distribution, Lizenzprüfung, Updates                 | Login, Download, Update, Start             |
+| Microsoft-/Xbox-Services        | Identitäts- und Sitzungsverwaltung                   | Authentifizierung, Profil, Realms-Zugriff  |
+| Community-/Dedicated-Server     | Von Dritten betriebene Mehrspielerserver             | Client-Verbindung via Serverprotokoll      |
+| Modding-/Plugin-Plattformen     | Austausch und Distribution von Mods/Plugins           | Download, Dokumentation                    |
+| Marketplace / Content-Plattform | Verkauf und Bereitstellung offizieller Inhalte       | Kaüfe, Lizenzprüfung, Download           |
+| Bildungseinrichtungen           | Nutzung von Minecraft Education                       | Klassensteürung, Bereitstellung von Welten|
+
+### 3.3 Kontextdiagramm
+
+Das Kontextdiagramm zeigt Clients, Server, Identitätsdienste, Distribution und externe Inhalte im überblick.
+
+![Kontextdiagramm – Minecraft-Referenzarchitektur](diagrams/kontext.svg)
+
+### 3.4 Anwendungsfalldiagramm
+Das Anwendungsfalldiagramm stellt zentrale Interaktionen schematisch dar, insbesondere:
+
+- Welt erkunden und baün
+- Ressourcen abbaün und verarbeiten
+- Kämpfen und überleben
+- Mehrspieler-Spiel beitreten / hosten
+- Server administrieren
+- Inhalte und Erweiterungen nutzen (Resource Packs, Datapacks, Mods, Add-ons)
+- In Education-Szenarien Welten bereitstellen, Aufgaben steürn
+
+Die Visualisierung zeigt dabei Spielende, Server-Administratoren und Lehrpersonen als Akteure und ihre jeweiligen Anwendungsfälle im Zusammenspiel mit Client und Server.
+
+![Anwnedungsfälle – Minecraft-Referenzarchitektur](diagrams/anwendungsfaelle.svg)
+
 ---
-#### Externe Akteure und Systeme
-| Akteur / System                                  | Beschreibung                                                                     | Interaktion mit Minecraft                                                                         |
-| ------------------------------------------------ | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| **Spieler (Client)**                             | Endbenutzer, die Minecraft auf PC, Konsole oder Mobilgerät spielen.              | Interagieren mit der Spielwelt über Tastatur, Maus oder Controller; senden Befehle an den Server. |
-| **Multiplayer-Server**                           | Server, auf dem die Spielwelt und Spielregeln zentral laufen.                    | Empfängt Spieleraktionen, synchronisiert Zustände und verwaltet Spielregeln.                      |
-| **Minecraft Launcher / Plattform**               | Offizielle Distributionsplattform für das Spiel (Login, Updates, Lizenzprüfung). | Startet die Anwendung, prüft Benutzeridentität und lädt Updates.                                  |
-| **Microsoft Account / Xbox Live Services**       | Authentifizierungs- und Cloud-Dienst.                                            | Ermöglicht Login, Freundeslisten, Multiplayer- und Marketplace-Funktionen.                        |
-| **Modding-Plattformen (Forge, Fabric, Add-ons)** | Frameworks und Tools für die Community-Erweiterungen.                            | Stellen Schnittstellen bereit, um Spielinhalte und Logik zu verändern.                            |
-| **Ressourcenserver / Marketplace**               | Offizielle Quelle für Skins, Welten, Add-ons.                                    | Download und Lizenzprüfung von Inhalten.                                                          |
-| **Bildungsplattform (Minecraft Education)**      | Variante für Schulen und Unterricht.                                             | Interagiert mit Lernplattformen und Lehrerkonten.                                                 |
-
----
-#### Kontextdiagramm der Anwendung
-
-![Kontextdiagramm](diagrams/kontext.png)
-
----
-
-#### Beschreibung der Umgebung
-
-Minecraft befindet sich in einem ökosystemartigen Umfeld aus Clients, Servern und Community-Plattformen.  
-Die wesentlichen Kommunikationsflüsse sind:
-
-1. Spieler ↔ Server: Aktionen und Ereignisse werden in Echtzeit über TCP/IP synchronisiert.
-
-2. Client ↔ Launcher: Authentifizierung, Versionsverwaltung, Startparameter.
-
-3. Server ↔ Datenhaltung: Speicherung der Welt (Chunks, Spielerinventar, Fortschritt).
-
-4. Server ↔ Modding-Schnittstellen: Integration von Community-Erweiterungen.
-
-5. Client ↔ Microsoft Services: Online-Login, Multiplayer, Cloud-Speicherung, Marketplace-Zugriff.
-
-
-#### Visuelle Struktur (für späteres Diagramm)  
-Wenn ihr das Diagramm erstellt, sollte es ungefähr so aufgebaut sein:
-
-```text
-      +-------------------------+ 
-      | Microsoft/Xbox Services |
-      +-----------+-------------+
-                  |
-                  v
-     +---------------------------------+
-     |       Minecraft Launcher        |
-     +---------------------------------+
-                  |
-                  v
-   +--------------------------------------+
-   |           Minecraft Client           |
-   +--------------------------------------+
-          |                    |
-          | Multiplayer (TCP/IP)|
-          v                    v
-   +--------------------------------------+
-   |          Minecraft Server            |
-   +--------------------------------------+
-          |                    |
-          | Modding API        | Datenhaltung
-          v                    v
-   +-------------+     +-------------------+
-   | Forge/Fabric|     | NBT Save Files    |
-   +-------------+     +-------------------+
-
-```
-
-
-
-
-
 
 ## 4. Lösungsstrategie
-### Architekturgrundidee
 
-Minecraft verfolgt eine Client-Server-Architektur, die es erlaubt, sowohl Einzelspieler- als auch Mehrspielersitzungen zu betreiben.  
-Dabei gilt das Prinzip:
-- Der Server bestimmt die Spielrealität, der Client visualisiert sie.
+### 4.1 Architekturstil und Leitprinzipien
 
-Diese klare Trennung ermöglicht:
-- Multiplayer über Netzwerk (lokal oder online)
-- Modulare Erweiterungen durch Plugins oder Mods
-- Stabilen Betrieb, auch wenn einzelne Clients abstürzen
+- Strikte **Client-Server-Architektur** mit serverseitiger Autorität
+- **Schichten- und Komponentenarchitektur** für Client, Server, Persistenz und Erweiterungen
+- **Ereignis- und datengetriebenes Design** (Events, Hooks, Konfiguration statt Hardcoding)
+- **Produktlinien-Ansatz**:
+  - Gemeinsame Architekturprinzipien für Java, Bedrock, Education, Realms
+- Offenheit für kontrollierte Erweiterbarkeit
 
-### Zentrale Architekturentscheidungen
-| Bereich                    | Entscheidung                                                        | Begründung                                                                                                       |
-| -------------------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| **Architekturtyp**         | Client-Server-Modell                                                | Trennung von Spiellogik (Server) und Darstellung (Client) ermöglicht Multiplayer, Sicherheit und Skalierbarkeit. |
-| **Programmiersprache**     | Java (Java Edition) / C++ (Bedrock Edition)                         | Plattformunabhängigkeit (Java) und Performance auf Konsolen (C++).                                               |
-| **Rendering-Engine**       | Eigenentwicklung auf Basis von OpenGL (Java) bzw. DirectX (Bedrock) | Volle Kontrolle über Blockrendering, Beleuchtung und Partikeleffekte.                                            |
-| **Persistenz**             | NBT-Dateiformat (Named Binary Tag)                                  | Effiziente, strukturierte Speicherung der Spielwelten (Chunks, Entities, Items).                                 |
-| **Netzwerkprotokoll**      | TCP/IP mit eigenem Binärprotokoll                                   | Zuverlässige Übertragung von Spieleraktionen und Weltzuständen.                                                  |
-| **Modding-Fähigkeit**      | Offene Schnittstellen (Forge, Fabric, Bedrock Add-ons)              | Förderung der Community-Entwicklung, Anpassbarkeit der Spielmechanik.                                            |
-| **Plattformunterstützung** | Multi-Plattform über verschiedene Editionen                         | Breite Zielgruppe: PC, Konsole, Mobile, Education.                                                               |
+### 4.2 Strategien zur Erreichung der Qualitätsziele
 
-
-
-
-### Entwurfsprinzipien
-1. Trennung von Logik und Darstellung  
-   Spiellogik läuft auf dem Server, Darstellung (3D-Welt, UI) im Client.
-2. Ereignisgesteuertes System  
-   Spielereignisse (Bewegung, Blockabbau, Crafting) lösen serverseitige Aktionen aus.
-3. Chunk-basierte Weltstruktur  
-   Die Welt ist in 16×16×256 Blöcke unterteilt, wodurch effizientes Laden und Speichern möglich ist.
-4. Erweiterbarkeit durch Plugins und Mods  
-   Kernsystem bietet stabile Schnittstellen, auf die Mods aufsetzen können.
-5. Skalierbarkeit durch dedizierte Server  
-   Server können für kleine Gruppen (LAN) oder große Communities (z. B. Hypixel) betrieben werden.
-
-### Sicherheits- und Integritätsprinzipien
-- Serverseitige Autorität: Der Server prüft alle Aktionen (z. B. keine unzulässigen Bewegungen oder Items).
-- Sandbox-Isolation: Mods und Add-ons laufen in definierten Umgebungen, um Stabilität und Sicherheit zu gewährleisten.
-- Authentifizierung: Spieleridentität wird über Microsoft/Xbox-Accounts verifiziert.
-
-### Erweiterbarkeit und Anpassbarkeit
-Minecraft ist von Beginn an so konzipiert, dass Community-Erweiterungen möglich sind:
-- Neue Blöcke, Biome, Mobs oder Spielmechaniken
-- Serverseitige Skripte (Command Blocks, Datapacks)
-- Clientseitige Texturen, Shader und UI-Modifikationen  
-Dadurch bleibt das System langfristig erweiterbar und anpassbar, ohne den Kern neu entwickeln zu müssen.
-
-## 5. Bausteinsicht
-### Ziel der Bausteinsicht
-Die Bausteinsicht zeigt den inneren Aufbau der Anwendung Minecraft.
-Sie beschreibt die wichtigsten Module, Komponenten und ihre Verantwortlichkeiten innerhalb der Systemgrenze.
-Dadurch wird sichtbar, wie das System in logische Teile gegliedert ist und wie diese miteinander interagieren.
-
-### Übersicht der Hauptkomponenten
-Minecraft besteht aus fünf zentralen Bausteinen, die zusammen das Gesamtsystem bilden:  
-
-
-| Komponente                   | Beschreibung                                               | Hauptverantwortung                                                                                                                                                                    |
-| ---------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1. Client**                | Darstellung und Benutzerinteraktion                        | - Darstellung der 3D-Welt<br>- Eingabe von Tastatur, Maus, Controller<br>- Menüführung und Benutzeroberfläche<br>- Kommunikation mit dem Server über Netzwerkprotokolle               |
-| **2. Server**                | Spiellogik und Weltverwaltung                              | - Verarbeitung von Spieleraktionen<br>- Synchronisierung der Weltzustände<br>- Verwaltung von Regeln, Physik und Entities<br>- Verwaltung von Spieler- und Weltzuständen              |
-| **3. Datenhaltung**          | Speicherung und Verwaltung persistenter Spielinformationen | - Speicherung der Welt (Chunks)<br>- Speicherung von Spielständen, Inventaren und Konfigurationen<br>- Verwendung des NBT-Dateiformats<br>- Verwaltung von Backups und Ladeprozessen  |
-| **4. Netzwerkkommunikation** | Verbindung zwischen Client und Server                      | - Realisiert das Client-Server-Protokoll<br>- Überträgt Zustände, Bewegungen und Ereignisse<br>- Gewährleistet Datenkonsistenz über TCP/IP<br>- Fehlererkennung und Paketwiederholung |
-| **5. Modding-System / API**  | Erweiterbarkeit und Anpassbarkeit der Anwendung            | - Bereitstellung von Schnittstellen für Mods und Plugins<br>- Erlaubt server- und clientseitige Erweiterungen<br>- Unterstützt Frameworks wie Forge, Fabric oder Bedrock Add-ons      |
-
-
-### Anwendungsfalldiagramm
-![Anwendungsfalldiagramm](diagrams/anwendungsfaelle.png)
-
-
-### Zusammenspiel der Komponenten
-1. Client sendet Benutzereingaben (z. B. Bewegung, Aktionen) an den Server.
-2. Server verarbeitet diese Ereignisse, prüft sie auf Gültigkeit und aktualisiert den Weltzustand.
-3. Änderungen werden über die Netzwerkkommunikation an alle betroffenen Clients verteilt.
-4. Der Client rendert die neue Weltansicht basierend auf den erhaltenen Daten.
-5. Alle Spielzustände werden periodisch oder ereignisgesteuert in der Datenhaltung gespeichert.
-6. Das Modding-System kann an jeder dieser Komponenten Erweiterungen einfügen (z. B. neue Blöcke, Spielmechaniken, UI-Elemente).
-
-
-### Beispielhafte Struktur (für das spätere Diagramm)
-```
-+--------------------------------------------------------+
-|                   Minecraft Anwendung                  |
-|--------------------------------------------------------|
-|  +---------------+   +---------------+   +------------+ |
-|  |    Client     |<->|   Netzwerk    |<->|   Server   | |
-|  +---------------+   +---------------+   +------------+ |
-|          |                                   |          |
-|          v                                   v          |
-|  +---------------+                   +---------------+  |
-|  |   Modding     |                   |  Datenhaltung |  |
-|  +---------------+                   +---------------+  |
-+--------------------------------------------------------+
-
-```
-
-
-## 6. Laufzeitsicht (optional)
-(optional, falls ihr Abläufe zeigen wollt).
-
-## 7. Verteilungssicht
-### Ziel der Verteilungssicht  
-
-Die Verteilungssicht zeigt, wo und wie die einzelnen Softwarekomponenten von Minecraft betrieben werden.  
-Sie beschreibt die Hardware- bzw. Systemumgebung (Clients, Server, Plattformen, Netzwerke) sowie deren Kommunikationsbeziehungen.  
-Damit wird ersichtlich, wie die logische Architektur auf reale Systeme abgebildet wird.  
-
-### Übersicht der physischen Verteilung
-| Systemkomponente                 | Beschreibung                                                    | Typische Umgebung                                             |
-| -------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------- |
-| **Client-Gerät**                 | Führt die Benutzeroberfläche und das Rendering der 3D-Welt aus. | PC, Notebook, Konsole oder Mobilgerät                         |
-| **Server**                       | Verwaltet die Spielwelt, Spielregeln und Mehrspielersitzungen.  | Lokaler Rechner, dedizierter Server, Cloud (z. B. AWS, Azure) |
-| **Microsoft/Xbox Services**      | Authentifizierung, Cloud-Speicher, Multiplayer-Verwaltung.      | Microsoft Cloud (zentrale Server)                             |
-| **Modding-/Content-Plattformen** | Stellen Erweiterungen, Skins, Texturen und Mods bereit.         | Externe Web- oder Cloud-Server                                |
-| **Datenhaltung**                 | Speicherung von Spielwelten, Benutzerinventaren, Logs.          | Lokal auf Serverlaufwerk oder Cloud-Speicher                  |
-
-
-### Typische Verteilung einer Minecraft-Umgebung
-1. Spielergerät (Client):  
-- Läuft auf Windows, macOS, Linux oder mobilen Betriebssystemen.  
-- Enthält Rendering-Engine, Eingabelogik, UI und Netzwerkmodul.  
-- Kommuniziert über das Internet mit einem dedizierten Server.  
-
-2. Server:  
-- Hostet eine oder mehrere Welten.  
-- Führt Spiellogik, Ereignisverwaltung und Weltupdates aus.  
-- Speichert Welt- und Spielerinformationen (NBT-Dateien).  
-- Stellt Netzwerkdienste über TCP-Port (Standard: 25565) bereit.  
-
-3. Externe Dienste (Microsoft/Xbox, Marketplace, Mods):  
-- Übernehmen Authentifizierung, Konto-Management und Download von Zusatzinhalten.  
-- Laufen vollständig in der Microsoft-Cloud oder auf Community-Plattformen.  
-
-4. Kommunikation:  
-- Alle Verbindungen laufen über das Internet (TCP/IP).  
-- Für Multiplayer wird eine direkte Client–Server-Verbindung hergestellt.  
-- Authentifizierungsdaten werden über HTTPS an Microsoft/Xbox übertragen.  
-
-### Beschreibung des (noch zu erstellenden) Verteilungsdiagramms
-Das Verteilungsdiagramm sollte den Aufbau etwa so darstellen:
-````
-+---------------------------------------------------------------+
-|                        Internet / Netzwerk                    |
-|---------------------------------------------------------------|
-|                                                               |
-|   +-----------------+        TCP/IP        +----------------+ |
-|   | Minecraft Client|<-------------------> | Minecraft Server| |
-|   | (z.B. Laptop)   |                     | (z.B. Cloud VPS) | |
-|   +-----------------+                     +----------------+ |
-|           |                                          |        |
-|           | HTTPS (Login)                            | I/O     |
-|           v                                          v        |
-|   +------------------+                     +----------------+ |
-|   | Microsoft/Xbox   |                     |  Datenspeicher | |
-|   |  Auth Services   |                     | (World Saves)  | |
-|   +------------------+                     +----------------+ |
-|                                                               |
-+---------------------------------------------------------------+
-````
-
-### Variante der Verteilung
-| Variante                      | Beschreibung                                                     | Beispiel                                         |
-| ----------------------------- | ---------------------------------------------------------------- | ------------------------------------------------ |
-| **Einzelspieler-Modus**       | Client und Server laufen auf demselben Gerät.                    | Spieler startet lokale Welt über „Singleplayer“. |
-| **LAN-Server**                | Server läuft auf einem Rechner im lokalen Netzwerk.              | Schulnetzwerk oder gemeinsames WLAN-Spiel.       |
-| **Dedizierter Online-Server** | Server läuft auf einem gehosteten System (z. B. Cloud-VPS).      | Öffentliche Server wie Hypixel oder Aternos.     |
-| **Education Edition**         | Server und Clients sind über Schulnetzwerk oder Cloud verbunden. | Unterrichtsumgebung mit zentraler Verwaltung.    |
-
-
-### Kommunikationsbeziehungen
-- Client ↔ Server: Spielinteraktionen, Positions- und Weltupdates (TCP/IP).
-- Client ↔ Microsoft/Xbox Services: Authentifizierung, Multiplayer-Sitzung, Freundesliste.
-- Server ↔ Datenhaltung: Speicherung der Weltdateien, Backups, Logs.
-- Server ↔ Modding-System: Zugriff auf Mod-Plugins, Event Hooks, Konfiguration.
-
-### Verteilungsdiagramm
-![Verteilungsdiagramm](diagrams/verteilung.png)
-
-
-
-## 8. Qualitätsanforderungen  
-### Ziel  
-<br>
-Die Qualitätsanforderungen beschreiben die wichtigsten Qualitätsziele, die das System Minecraft erfüllen muss.  
-Sie dienen als Grundlage für Entwurfsentscheidungen und zukünftige Erweiterungen.  
-Jede Anforderung wird mit einem Ziel, einer Begründung und einer Maßnahme beschrieben.  
+- Performance: Chunking, Tick-System, Caching, Sichtweitensteürung
+- Stabilität: Robust gespeicherte Weltdaten, Crash-Handling, Wiederanlauf
+- Erweiterbarkeit: Offizielle Schnittstellen, strukturierte Datenformate
+- Sicherheit: Autoritativer Server, zentrale Authentifizierung, restriktive Rechte
+- Portabilität: Abstraktionsschichten für Rendering, Input, Filesystem und Netzwerk
 
 ---
 
-1. Leistungsfähigkeit (Performance)
+## 5. Bausteinsicht (Building Block View)
 
-| Aspekt         | Beschreibung                                                                                                                                                                                                                                            |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Ziel**       | Das System soll auch bei großen Welten und mehreren gleichzeitigen Spielern flüssig laufen.                                                                                                                                                             |
-| **Begründung** | Eine stabile Bildrate (FPS) und geringe Latenz sind essenziell für ein immersives Spielerlebnis.                                                                                                                                                        |
-| **Maßnahmen**  | - Chunk-basierte Weltstruktur zur dynamischen Ladeoptimierung.<br>- Multithreading für Rendering, Netzwerk und Physik.<br>- Nutzung von Level-of-Detail-Mechanismen und Caching.<br>- Serverseitige Optimierung von Tick-Rate und Ereignisverarbeitung. |
+### 5.1 Gesamtübersicht
+
+Die Bausteinsicht gliedert das System in Client, Server, Persistenz und Qürschnittsfunktionen:
+
++-----------------------------------------------------------+
+|                     Minecraft System                      |
++-----------------------------------------------------------+
+|  Client Layer   |  Server Layer   |  Persistence Layer    |
++-----------------------------------------------------------+
+|   Cross-Cutting & Extension Layer (APIs, Mods, Add-ons)   |
++-----------------------------------------------------------+
+
+### 5.2 Client Layer
+
+**Verantwortungen**
+
+- Rendering der Spielwelt und Benutzeroberflächen
+- Verarbeitung von Eingaben (Maus, Tastatur, Controller, Touch)
+- Anzeige von Inventar, Chat, Statusinformationen, Menüs
+- Aufbau und Verwaltung der Netzwerkverbindung zum Server
+- Lokales Caching von Chunks und Ressourcen
+- Start eines integrierten Servers im Singleplayer (Java)
+
+**Zentrale Bausteine**
+
+- Rendering Engine
+- UI/HUD-System
+- Input-Abstraktion
+- Netzwerk-Clientmodul
+- Resource-Pack-Management
+
+### 5.3 Server Layer
+
+**Verantwortungen**
+
+- Autoritative Spiellogik (Regeln, Physik, Kampf, Interaktionen)
+- Verwaltung von Welten, Dimensionen, Biomen, Strukturen
+- Verwaltung von Entitäten und Block-Entitäten
+- Session-Management (Login, Logout, Zeitüberschreitung)
+- Rechte- und Rollenkonzept (Operatoren, Permissions)
+- Synchronisierung der relevanten Welt- und Entitätsdaten an Clients
+- Integration von Plugins/Mods auf dedizierten Servern
+
+**Zentrale Bausteine**
+
+- Tick-Engine (Game Loop)
+- World Manager
+- Entity Manager
+- Game Rule Engine
+- Netzwerk-Server-Endpunkt
+- Command-/Admin-Interface
+- Plugin-/Modding-Layer
+
+### 5.4 Persistence Layer
+
+**Verantwortungen**
+
+- Speicherung von Weltdaten (Chunks, Regionen, Strukturen)
+- Speicherung von Spielerprofilen (Position, Inventar, Statistiken)
+- Speicherung von Konfigurationen, Whitelists, Bans, Berechtigungen
+- Unterstützung von Backups, Restores und Migrationen
+
+**Kernkonzepte**
+
+- NBT-basierte und ähnliche binäre Formate
+- Dateistruktur pro Weltinstanz
+- Schreibstrategien zur Sicherstellung von Konsistenz
+
+### 5.5 Netzwerk & Protokoll
+
+**Verantwortungen**
+
+- Aufbau, überwachung und Abbau von Client-Server-Verbindungen
+- Handshake mit Protokoll- und Versionsprüfung
+- Authentifizierungsablauf (Online-Modus)
+- Serialisierung/Deserialisierung von Spielereignissen, Bewegungen, Chat, Welt-Updates
+- Umgang mit Paketverlust, Latenz und Timeouts
+
+**Schnittstellen**
+
+- Definierte Pakettypen (Login, Status, ChunkData, EntityUpdate, Chat, Interaktion)
+- Callbacks in Serverlogik und Clientdarstellung
+
+### 5.6 Extension & Modding Layer
+
+**Verantwortungen**
+
+- Definition offizieller Erweiterungspunkte (Events, APIs, Registries)
+- Einbindung von Mods, Plugins, Datapacks, Resource Packs, Add-ons
+- Kapselung von Drittcode, um Kernlogik zu schützen
+
+**Beispiele**
+
+- Java Edition: Forge, Fabric, Bukkit/Spigot/Paper, Datapacks, Resource Packs
+- Bedrock Edition: Behavior Packs, Resource Packs, Scripting APIs
 
 ---
 
-2. Zuverlässigkeit und Stabilität
+## 6. Laufzeitsicht (Runtime View)
 
-| Aspekt         | Beschreibung                                                                                                                                                                                                                                  |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Ziel**       | Minecraft soll dauerhaft stabil laufen und Spielstände zuverlässig speichern, auch bei unerwarteten Unterbrechungen.                                                                                                                          |
-| **Begründung** | Datenverlust oder Systemabstürze würden das Spielerlebnis stark beeinträchtigen.                                                                                                                                                              |
-| **Maßnahmen**  | - Automatische Zwischenspeicherung von Welt- und Inventardaten (Autosave).<br>- Wiederherstellung beim Neustart (Crash Recovery).<br>- Getrennte Thread-Verwaltung für kritische Prozesse.<br>- Regelmäßige Backup-Funktion im Serverbetrieb. |
+### 6.1 Szenario: Multiplayer-Login
 
----
-
-3. Erweiterbarkeit und Modifizierbarkeit
-
-| Aspekt         | Beschreibung                                                                                                                                                                                                                           |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Ziel**       | Das System soll flexibel erweiterbar sein, ohne den Kerncode verändern zu müssen.                                                                                                                                                      |
-| **Begründung** | Minecraft lebt von einer aktiven Modding-Community, die neue Inhalte und Spielmechaniken entwickelt.                                                                                                                                   |
-| **Maßnahmen**  | - Bereitstellung stabiler APIs (Forge, Fabric, Add-ons).<br>- Ereignisbasierte Architektur mit klar definierten Hooks.<br>- Modularer Aufbau von Client und Server.<br>- Unterstützung von Konfigurationsdateien für Mods und Plugins. |
-
----
-
-4. Plattformunabhängigkeit (optional, aber erwähnenswert)
-
-| Aspekt         | Beschreibung                                                                                                                                                                     |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Ziel**       | Minecraft soll auf verschiedenen Plattformen (PC, Konsole, Mobile, Cloud) laufen.                                                                                                |
-| **Begründung** | Eine breite Nutzerbasis und flexible Nutzung erfordern plattformübergreifende Unterstützung.                                                                                     |
-| **Maßnahmen**  | - Entwicklung separater Editionen (Java / Bedrock).<br>- Nutzung plattformabhängiger APIs (OpenGL, DirectX, Metal).<br>- Synchronisierung zentraler Daten über Microsoft-Konten. |
-
----
-
-5. Benutzerfreundlichkeit (optional, falls ihr ein viertes Hauptziel möchtet)
-
-| Aspekt         | Beschreibung                                                                                                                                           |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Ziel**       | Die Steuerung und das Interface sollen für alle Altersgruppen intuitiv verständlich sein.                                                              |
-| **Begründung** | Minecraft richtet sich an Spieler jeden Alters, einschließlich Kinder und Lernumgebungen.                                                              |
-| **Maßnahmen**  | - Einheitliches UI-Design über alle Plattformen.<br>- Einfache Steuerung mit Standardtasten und Symbolen.<br>- Kontextbezogene Tooltips und Tutorials. |
+1. Client startet und lädt Ressourcen.
+2. Spielerin/Spieler wählt einen Server aus.
+3. Client baut eine Netzwerkverbindung zum Server auf.
+4. Protokoll-Handshake und Versionsabgleich.
+5. Authentifizierung über Microsoft-/Xbox-Services (Online-Modus).
+6. Server prüft Whitelist/Bans und lädt Spielerprofil.
+7. Server sendet Startposition, relevante Chunks und Entitätsdaten.
+8. Laufender Betrieb: Client sendet Aktionen; Server validiert und beantwortet mit Updates.
 
 
+### 6.2 Szenario: Block platzieren
 
-## 9. Anhänge
-Links, Quellen, GitHub-Workflows.
+1. Spielerin/Spieler wählt Block im Inventar.
+2. Client berechnet Zielposition und sendet PlaceBlock-Anfrage.
+3. Server prüft Reichweite, Rechte, Spielmodus, Kollisionen.
+4. Bei Erfolg aktualisiert der Server Welt- und Inventardaten.
+5. Server sendet Block-Update an alle relevanten Clients.
+6. Clients aktualisieren die Darstellung.
+
+### 6.3 Szenario: Plugin-Event (Java Dedicated Server)
+
+1. Spieler joined den Server.
+2. Server erzeugt ein PlayerJoinEvent.
+3. Registrierte Plugins erhalten das Event.
+4. Plugins führen eigene Logik aus (Begrüssung, Checks, Logging).
+5. änderungen erfolgen ausschliesslich über definierte APIs; Kernlogik bleibt autoritativ.
 
 ---
 
-© 2025 – Gruppenarbeit Architektur Minecraft  
-Autorengruppe: *Fabian, Teo, Eldin, Thomas*  
-Schule: *Feusi Bildungszentrum*  
-Dozent: *Björn Michels*  
-Abgabedatum: 16.11.2025  
-Präsentation: 19.11.2025
+## 7. Verteilungssicht (Deployment View)
+
+### 7.1 Deployment-Varianten
+
+- Singleplayer: Client + integrierter Serverprozess auf einem Gerät
+- LAN-Server: Ein Host im lokalen Netz, weitere Clients verbinden sich
+- Dedizierter Server: Separater Server in Rechenzentrum/Cloud
+- Realms: Verwaltete Serverinstanzen durch Mojang/Microsoft
+- Education Edition: Spezifische Deployments mit Classroom-Management
+
+### 7.2 Beispielhafte Deployment-Ansicht
+
+Die beispielhafte Deployment-Ansicht zeigt ein typisches Online-Szenario:
+
+- Ein oder mehrere Minecraft-Clients (PC, Konsole, Mobile) verbinden sich über das Internet via TCP/IP mit einem Minecraft-Server, der entweder lokal (on-premises) oder auf einem VPS bzw. in der Cloud betrieben wird.
+- Der Minecraft-Server ist für Spiellogik, Weltzustand und Synchronisation zuständig und greift lokal auf die Welt- und Spieldaten (z. B. NBT-Dateien) zu.
+- Parallel dazu kommuniziert der Client bei aktivem Online-Modus über HTTPS mit den Microsoft-/Xbox-Auth-Services, um Identität, Lizenzen und ggf. Realms-Zugriffe zu validieren.
+- Die Verantwortlichkeiten sind klar getrennt:
+  - Authentifizierung und Kontenverwaltung bei Microsoft-/Xbox-Services,
+  - autoritative Spiellogik und Weltverwaltung beim Minecraft-Server,
+  - Darstellung und Eingabeverarbeitung beim Client.
+
+Diese Struktur ermöglicht einen skalierbaren, sicheren Mehrspielerbetrieb, bei dem zentrale Dienste (Auth, Realms) von Mojang/Microsoft bereitgestellt werden, während Serverbetreiber ihre Instanzen flexibel hosten können.
+
++--------------------------------------------------------------+
+|                        Internet / Netzwerk                   |
++--------------------------------------------------------------+
+|  +-----------------+       TCP/IP       +------------------+ |
+|  | Minecraft Client| <----------------> | Minecraft Server | |
+|  | (PC/Konsole)    |                    | (VPS / lokal)    | |
+|  +-----------------+                    +------------------+ |
+|         |                                         |          |
+|         | HTTPS (Auth, Profile, Realms)           | FS       |
+|         v                                         v          |
+|  +-------------------+                    +----------------+ |
+|  | Microsoft-/Xbox   |                    | Welt-/Spiel-   | |
+|  | Auth Services     |                    | Daten (NBT)    | |
+|  +-------------------+                    +----------------+ |
++--------------------------------------------------------------+
+
+![Verteilungssicht – Beispielhaftes Deployment](diagrams/verteilung.svg)
+
+---
+
+## 8. Qürschnittliche Konzepte
+
+### 8.1 Sicherheitskonzept
+
+Grundsatz: **Der Server ist autoritativ, der Client nie voll vertraünswürdig.**
+
+- Serverseitige Prüfung aller relevanten Aktionen (Bewegung, Schaden, Inventar, Blockaktionen)
+- Nutzung von Microsoft-/Xbox-Accounts im Online-Modus
+- Whitelists, Bans, Rollen- und Berechtigungssysteme
+- Validierung eingehender Pakete (Struktur, Freqünz, Wertebereiche)
+- Einsatz von Anti-Cheat-Mechanismen (Kern + optionale Plugins)
+- Beschränkung des Zugriffs auf Serverkonsole, Dateien und Administrationsschnittstellen
+
+Ziel ist eine möglichst faire, manipulationsresistente Spielumgebung bei vertretbarem Aufwand.
+
+### 8.2 Konfigurationskonzept
+
+Leitidee: **Verhalten wird über Konfiguration und Daten gesteürt, nicht über Ad-hoc-Codeänderungen.**
+
+Ebenen:
+
+- Server-Basis-Konfiguration (z. B. `server.properties`)
+- Welt- und Regelkonfiguration (Gamerules, Weltparameter)
+- Erweiterungskonfigurationen (Plugins, Mods, Add-ons)
+- Resource Packs und Datapacks für Inhalte und Regeln
+
+Anforderungen:
+
+- Klare Trennung von Standard- und projektspezifischen Einstellungen
+- Dokumentierte Default-Werte
+- Möglichkeit von Anpassungen zur Laufzeit (z. B. Befehle, Skripte)
+
+### 8.3 Fehler- und Loggingkonzept
+
+- Zentrale Logfiles für Start/Stop, Warnungen, Fehler, wichtige Events
+- Crash-Reports mit Umgebungsinformationen und Stacktraces
+- Optionale, datenschutzkonforme Telemetrie für Stabilitätsanalysen
+- Konfigurierbare Log-Level und Trennung von Kernlogs und Plugin-Logs
+
+Ziel ist eine gute Nachvollziehbarkeit von Problemen und eine effiziente Unterstützung von Serverbetreibenden.
+
+### 8.4 Internationalisierung
+
+- Alle Texte (UI, Meldungen, Itemnamen) liegen in separaten Sprachdateien vor.
+- Verwendung von Lokalisierungs-Keys statt harter Texte im Code.
+- Resource Packs können eigene Sprachdateien bereitstellen.
+- Sprachwechsel ist im Client konfigurierbar ohne Einfluss auf Spielmechanik.
+
+### 8.5 Performanz- und Skalierungskonzept
+
+Wesentliche Mechanismen:
+
+- Chunk-Streaming: Nur relevante Weltbereiche im Speicher
+- Steürung von Render Distance (Client) und Simulation Distance (Server)
+- Tick-basiertes Verarbeitungsmodell (typisch 20 TPS)
+- Begrenzung von Entitäten, Redstone-Mechaniken und komplexen Farmen
+- Vertikale Skalierung (leistungsstärkere Hardware)
+- Horizontale Skalierung durch Servernetzwerke/Proxys (Lobby-Architekturen)
+
+Ziel: Stabiler Betrieb auch bei hoher Last und komplexen Spielwelten.
+
+---
+
+## 9. Architekturentscheidungen
+
+### 9.1 Client-Server statt Peer-to-Peer
+
+- Entscheidung für ein autoritatives Servermodell
+- Erleichtert Cheatschutz, Konsistenz und zentrale Regelprüfung
+- Führt zu höherer Komplexität im Server und Latenzanforderungen
+
+### 9.2 Chunk-basierte Weltorganisation
+
+- Welt in logisch feste Einheiten (Chunks, Regionen) aufgeteilt
+- Erlaubt effizientes Laden, Speichern und übertragen
+- Erfordert saubere Behandlung von Effekten an Chunk-Grenzen
+
+### 9.3 Binäre Speicherformate
+
+- Einsatz strukturierter, binärer Formate (z. B. NBT)
+- Kompakt, erweiterbar, toolfähig
+- Bedarf klarer Dokumentation und Migrationskonzepte
+
+### 9.4 Erweiterbarkeit über Schnittstellen
+
+- Offizielle APIs und Datenformate statt ausschliesslich inoffizieller Hacks
+- Stärkt Community-ökosystem, erhöht aber Aufwand für Rückwärtskompatibilität
+
+### 9.5 Separate Produktlinien (Java / Bedrock)
+
+- Unterschiedliche technische Basen für unterschiedliche Plattformziele
+- Gemeinsame Architekturprinzipien, aber getrennte Implementierungen
+- Risiko von Fragmentierung, erfordert klare Kommunikation und Synchronisation
+
+---
+
+## 10. Qualitätsanforderungen
+
+### 10.1 Qualitätsbaum
+
+Die wesentlichen Qualitätsmerkmale:
+
+- Funktionalität
+- Zuverlässigkeit
+- Benutzbarkeit
+- Effizienz
+- änderbarkeit & Erweiterbarkeit
+- Portabilität
+- Sicherheit
+- Wartbarkeit & Transparenz
+
+### 10.2 Beispielhafte Qualitätsszenarien
+
+**Performance**  
+Ein dedizierter Server mit 60+ aktiven Spielenden, umfangreichen Redstone-Anlagen und vielen Entitäten hält eine stabile Tick-Rate im akzeptablen Bereich; Latenzen bleiben für Spielende spielbar.
+
+**Zuverlässigkeit**  
+Kommt es während eines automatischen Speichervorgangs zu einem Absturz, kann der Server nach Neustart die Welt konsistent laden; maximal gehen wenige Sekunden Fortschritt verloren.
+
+**Sicherheit**  
+Ein modifizierter Client versucht, ungültige Bewegungen und Item-Duplikation zu nutzen. Der Server erkennt dies anhand der Regeln und verwirft die Aktionen bzw. sperrt bei wiederholten Verstössen den Account.
+
+**Erweiterbarkeit**  
+Ein Update fügt neü Blöcke und Mobs hinzu. Bestehende Welten bleiben nutzbar; sauber implementierte Plugins und Datapacks funktionieren weiter oder lassen sich mit überschaubarem Aufwand anpassen.
+
+**Portabilität**  
+Eine neü Plattform kann angebunden werden, indem Rendering-, Input- und Plattformzugriffe abstrahiert und an die bestehende Logik angebunden werden.
+
+---
+
+## 11. Risiken und Technische Schulden
+
+### 11.1 Fragmentierung
+
+- Unterschiedliche Editionen, Feature-Stände und Modding-ökosysteme
+- Gefahr von Verwirrung und uneinheitlichem Nutzererlebnis
+
+### 11.2 Abhängigkeit von Community-Plugins
+
+- Wichtige Funktionen häufig über Dritt-Plugins implementiert
+- Veraltete oder unsichere Plugins können Stabilität und Sicherheit beeinträchtigen
+
+### 11.3 Rückwärtskompatibilität
+
+- Langfristige Unterstützung alter Welten erschwert tiefgreifende Architekturverbesserungen
+- Bedarf an Konvertern und Migrationspfaden
+
+### 11.4 Komplexe Performanzmechaniken
+
+- Redstone, Entitäts-Logik und grosse Farmen können zu schwer nachvollziehbaren Lastspitzen führen
+- Optimierungen im Tick- und Update-System sind komplex und fehleranfällig
+
+---
+
+## 12. Glossar
+
+**Block**  
+Elementare Baüinheit der Spielwelt im voxelartigen Raster.
+
+**Chunk**  
+Fester Ausschnitt der Welt, zentrale Einheit für Speicherung, Laden und übertragung.
+
+**Region**  
+Datei-Einheit, die mehrere Chunks zusammenfasst, um I/O-Zugriffe zu optimieren.
+
+**Biome**  
+Gebiete mit spezifischen Umweltbedingungen, die Terrain, Vegetation und Mobs beeinflussen.
+
+**NBT (Named Binary Tag)**  
+Binäres, hierarchisches Datenformat zur effizienten Speicherung von Minecraft-Daten.
+
+**Entity**  
+Dynamisches Objekt in der Welt (Spielende, Mobs, Tiere, Projektile, Fahrzeuge etc.).
+
+**Block Entity / Tile Entity**  
+Block mit zusätzlichen Daten oder Logik (z. B. Truhe, Ofen, Beacon).
+
+**Tick**  
+Diskrete Verarbeitungseinheit der Spiel- und Serverlogik (typischerweise 20 pro Sekunde).
+
+**Dedicated Server**  
+Eigenständiger Serverprozess für Mehrspielerbetrieb ohne grafische Oberfläche.
+
+**Client**  
+Anwendung auf dem Endgerät, zuständig für Darstellung, Eingaben und Kommunikation mit dem Server.
+
+**Server**  
+Autoritative Instanz für Weltzustand, Spiellogik, Rechteverwaltung und Synchronisierung.
+
+**Client-Server-Protokoll**  
+Spezifisches, paketbasiertes Protokoll zwischen Client und Server.
+
+**Whitelist / Banliste / Permissions**  
+Mechanismen zur Steürung von Zugang und Berechtigungen auf einem Server.
+
+---
