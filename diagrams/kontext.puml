@@ -1,34 +1,32 @@
 @startuml kontext
-title Minecraft - Kontextdiagramm (Systemgrenze: Client + Server)
+title Minecraft
 
 skinparam componentStyle rectangle
 skinparam linetype ortho
 skinparam shadowing false
 left to right direction
 
-actor "Spieler (Client)" as Spieler
+' Menschen/Rollen im Umfeld
+actor "Spielende" as Spieler
+actor "Server-Administrationen / Hoster" as Admin
+actor "Community-Entwickelnde" as Dev
+actor "Betrieb / Support (Hersteller)" as Ops
 
-rectangle "Minecraft (Client + Server)" as System {
-  component "Minecraft Client" as Client
-  component "Minecraft Server" as Server
-  database "Persistente Daten\n(NBT Save Files)" as Daten
+' System im Fokus (Black Box)
+rectangle "Minecraft" as System
 
-  Client -[#DarkGray,dashed]> Server : TCP/IP\nMultiplayer
-  Server --> Daten : Speichern / Laden
-}
+' Externe, fachliche Nachbarsysteme (ohne Technik-Details)
+rectangle "Zahlungsdienstleister / Store\n(Microsoft Commerce)" as Commerce
+rectangle "Identitaetsdienst\n(Microsoft Account)" as Identity
 
-cloud "Minecraft Launcher /\nPlattform" as Launcher
-cloud "Microsoft Account /\nXbox Live Services" as MS
-cloud "Ressourcenserver /\nMarketplace" as Market
-node "Modding-Plattformen\n(Forge, Fabric, Add-ons)" as Modding
-folder "Bildungsplattform\n(Minecraft Education)" as Edu
+' Beziehungen auf Fach-/Organisations-Ebene (links  Mitte  rechts)
+Spieler -right-> System : Spielen, Chatten,\nInhalte nutzen
+Dev -right-> System : Inhalte bereitstellen\n(Mods/Datapacks)
+Admin -right-> System : Mehrspieler verwalten,\nModeration/Konfiguration
+Ops -right-> System : Betrieb, Support, Updates
 
-Spieler --> Client : Eingaben, Befehle
-Launcher --> Client : Start, Auth, Updates
-Client <--> MS : Login, Freunde, Multiplayer
-Client --> Market : Inhalte (Downloads)
-Modding <--> Server : Plugins, APIs
-Edu <--> Client : Unterrichtsfunktionen
+System -right-> Commerce : Zahlungsabwicklung\n(Kaeufe, Abos)
+System -right-> Identity : Konten & Lizenzen\n(Anmeldung)
 
 @enduml
 
