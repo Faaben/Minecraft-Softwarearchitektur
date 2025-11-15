@@ -4,6 +4,7 @@ Dieses Dokument folgt dem arc42-Template. Inhalte sind bewusst knapp gehalten un
 
 ---
 
+
 ## 1. Einführung und Ziele
 
 ### 1.1 Aufgabenstellung
