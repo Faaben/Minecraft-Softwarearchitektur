@@ -152,6 +152,9 @@ Damit ist der fachliche Kontext nachvollziehbar abgegrenzt; weniger relevante Na
 | Identitätsdienst (Microsoft Account)        | Verwalten Benutzerkonten und Anmeldungen                                          | Authentifizierungsanfragen, Token-Validierung („Konten & Lizenzen (Anmeldung)“)                 | Identität der Spielenden, Konten- und Lizenzinformationen                                     |
 | Zahlungsdienstleister / Store (Microsoft Commerce) | Abwicklung von Käufen, Abos und Lizenzen                                         | Kauf- und Aboanforderungen, Zahlungsdaten („Zahlungsabwicklung (Käufe, Abos)“)                  | Bestätigte Käufe, Lizenzen/Entitlements, Rechnungsinformationen                               |
 
+**Kontextdiagramm Minecraft-Referenzarchitektur** (Client, Server, Auth-Services, Launcher, Mod-Repos, lokales Dateisystem).
+![Kontextdiagramm - Minecraft-Referenzarchitektur](diagrams/kontext.svg)
+
 
 ### 3.2 Technischer Kontext (Technical Context)
 Das technische Kontextdiagramm betrachtet dieselben Kommunikationspartner, legt aber den Fokus auf die technischen Kanäle und Schnittstellen zwischen Minecraft und seiner Umgebung.
@@ -171,13 +174,6 @@ Aus Sicht der Architektur werden insbesondere folgende technischen Verbindungen 
 | Admin-/Management-Zugänge (z. B. RCON, SSH, Web-Admin) | Server-Administrationen / Hoster ↔ Minecraft-Server                  | Verwaltung der Server-Konfiguration, Logs, Moderations- und Betriebsaktionen                  |
 | HTTPS-API „Microsoft Account“             | Minecraft-Server ↔ Identitätsdienst (Microsoft Account)                | Anmeldung der Spielenden, Validierung von Konten und Lizenzen („Konten & Lizenzen (Anmeldung)“) |
 | HTTPS-API „Microsoft Commerce“            | Minecraft-Server ↔ Zahlungsdienstleister / Store (Microsoft Commerce)  | Abwicklung von Käufen und Abos, Verwaltung der Entitlements („Zahlungsabwicklung (Käufe, Abos)“) |
-
-### 3.3 Kontextdiagramm
-Siehe **Abbildung 1: Kontextdiagramm Minecraft-Referenzarchitektur** (Client, Server, Auth-Services, Launcher, Mod-Repos, lokales Dateisystem).
-
-![Kontextdiagramm - Minecraft-Referenzarchitektur](diagrams/kontext.svg)
-
-
 
 ---
 
