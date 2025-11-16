@@ -64,17 +64,34 @@ Primärer Akteur: Spieler
 
 
 ### 1.2 Qualitätsziele
-- **Performance und Skalierung:** Stabile Tick-Rate, effizientes Chunk-Streaming auch bei vielen Spielern und Entities.
-- **Stabilität und Datenintegrität:** Verlässliche Speicherung von Welten und Spielerzuständen, robuste Lade- und Speicherpfade.
-- **Erweiterbarkeit:** Mods/Plugins/Datapacks über klar definierte Schnittstellen und APIs integrierbar.
-- **Sicherheit und Fairness:** Serverseitige Autorität, Authentifizierung und Berechtigungssysteme (Permissions).
-- **Wartbarkeit und Transparenz:** Logging, Konfiguration und nachvollziehbare Schnittstellen für Betrieb und Support.
+
+Die folgenden Qualitätsziele haben für die Architektur des Minecraft-Modells die höchste Priorität  
+(1 = höchste Priorität):
+
+| Prio | Qualitätsziel                | Beschreibung / Beispiel                                                                 |
+|------|------------------------------|-----------------------------------------------------------------------------------------|
+| 1    | Performance und Skalierung   | Der Client und Server halten auch bei vielen gleichzeitigen Spielern eine stabile Tick-Rate und laden Chunks effizient nach. |
+| 2    | Stabilität und Datenintegrität | Welt- und Spielerzustände werden zuverlässig gespeichert; nach einem Absturz geht höchstens ein sehr kleiner Teil des Fortschritts verloren. |
+| 3    | Erweiterbarkeit              | Mods, Plugins und Datapacks können über klar definierte Erweiterungspunkte und APIs integriert und ohne Code-Anpassung im Kernsystem aktiviert/deaktiviert werden. |
+| 4    | Sicherheit und Fairness      | Nur korrekt authentifizierte Spieler können beitreten; serverseitige Autorität und Berechtigungssysteme verhindern Manipulationen und Cheating. |
+| 5    | Wartbarkeit und Transparenz  | Logging, Monitoring und gut strukturierte Konfiguration ermöglichen Betrieb und Support eine schnelle Fehleranalyse und gezielte Optimierungen. |
+
+Weitere, detailliertere Qualitätsanforderungen können bei Bedarf in Abschnitt 10 (Quality Requirements) verfeinert werden.
+
 
 ### 1.3 Stakeholder
-- Spielende
-- Community-Entwickelnde (Mods/Plugins/Tools)
-- Server-Administrationen / Hoster
-- Hersteller / Produktverantwortliche
+
+Die wichtigsten Stakeholder des Minecraft-Modells und ihre Erwartungen an Architektur und Dokumentation:
+
+| Rolle / Name                         | Beschreibung                                                | Erwartungen an Architektur und Dokumentation                              |
+|--------------------------------------|-------------------------------------------------------------|----------------------------------------------------------------------------|
+| Spielende                            | Personen, die Minecraft über Launcher und Client nutzen     | Verständliche Beschreibung der Hauptfunktionen und Szenarien (z. B. Singleplayer, Multiplayer, Inhalte kaufen). |
+| Community-Entwickelnde (Mods/Tools)  | Entwickelnde von Mods, Datapacks oder Tools                 | Klare Erweiterungspunkte, stabile Schnittstellen und Hinweise zu Beschränkungen. |
+| Server-Administrationen / Hoster     | Betreibende von Multiplayer-Servern oder Realms             | Überblick über relevante Komponenten, Schnittstellen zu Server/Realms und Qualitätsziele bezüglich Performance, Stabilität und Sicherheit. |
+| Hersteller / Produktverantwortliche  | Verantwortliche für Produktstrategie, Betrieb und Support   | Nachvollziehbare Architekturentscheidungen, Sicht auf Qualitätsziele, Risiken und Auswirkungen auf Betrieb und Weiterentwicklung. |
+| Lehrende / Dozent (didaktisches Modell) | Nutzt die Dokumentation als Bewertungsgrundlage und Beispiel | Kompakte, konsistente Dokumentation gemäß arc42 mit korrekt eingesetzten Diagrammen und klaren Beschreibungen. |
+
+Diese Rollen tauchen (teilweise mit leicht anderen Bezeichnungen) auch in den Kontext- und Anwendungsfalldiagrammen auf und sorgen so für Konsistenz zwischen Text und Diagrammen.
 
 ---
 
