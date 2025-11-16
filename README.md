@@ -6,7 +6,18 @@ Dieses Dokument beschreibt in vereinfachter, didaktischer Form die Architektur v
 
 
 ## 1. Einführung und Ziele
-Minecraft ist eine Open-World-Sandbox-Anwendung, in der Benutzer eine virtuelle Welt aus Blöcken erkunden, gestalten und verändern können. Das System kombiniert Elemente von Simulation, Kreativität, Überleben und Mehrspieler-Interaktion. Minecraft ist in Java (für die Java Edition) bzw. in C++ (für die Bedrock Edition) entwickelt und läuft plattformübergreifend auf Windows, macOS, Linux, Konsolen und Mobilgeräten.  
+Minecraft ist eine Open-World-Sandbox-Anwendung, in der Spielende eine virtuelle Welt aus Blöcken erkunden, gestalten und verändern können. Das System kombiniert Elemente von Simulation, Kreativität, Überleben und Mehrspieler-Interaktion.
+
+In der Realität existiert Minecraft in mehreren Editionen (u. a. Java Edition in Java und Bedrock Edition in C++), die plattformübergreifend auf Windows, macOS, Linux, Konsolen und Mobilgeräten laufen.
+
+Dieses Architektur-Dokument beschreibt Minecraft in einem **didaktisch reduzierten Modell** mit Fokus auf:
+
+- den Minecraft Launcher,
+- den Minecraft Client,
+- die Anbindung an Online-Dienste (Microsoft-/Xbox-Services, Marketplace)
+- sowie das Umfeld mit Servern/Realms.
+
+Ziel ist es, die zentralen Anforderungen, Qualitätsziele und Architekturentscheidungen übersichtlich darzustellen.
 
 
 ### 1.1 Anforderungen – Überblick
