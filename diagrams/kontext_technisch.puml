@@ -6,8 +6,18 @@ skinparam linetype ortho
 skinparam shadowing false
 left to right direction
 
+' Stereotypen-Text ausblenden
+hide stereotype
+
+' System hervorheben
+skinparam rectangle {
+  BorderColor<<system>> black
+  BorderThickness<<system>> 2
+  RoundCorner<<system>> 15
+}
+
 ' System of Interest als Blackbox
-rectangle "Minecraft-Spielsystem\n(Launcher, Client, Server/Realms)" as Minecraft
+rectangle "\n\n     Minecraft-Spielsystem\n     (Launcher, Client, Server/Realms)     \n\n" as Minecraft  <<system>>
 
 ' Technische Nachbarsysteme
 node "Endgeraete\n(Desktop, Konsole, Mobilgeraet)" as Clients
