@@ -11,7 +11,6 @@ hide stereotype
 
 ' System hervorheben
 skinparam rectangle {
-  BackgroundColor<<system>> #EEEEFF
   BorderColor<<system>> black
   BorderThickness<<system>> 2
   RoundCorner<<system>> 15
