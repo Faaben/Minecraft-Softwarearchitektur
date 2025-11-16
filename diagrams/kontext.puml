@@ -1,10 +1,21 @@
 @startuml kontext
-title Minecraft – Fachlicher Kontext
+title Minecraft - Fachlicher Kontext
 
 skinparam componentStyle rectangle
 skinparam linetype ortho
 skinparam shadowing false
 left to right direction
+
+' Stereotypen-Text ausblenden
+hide stereotype
+
+' System hervorheben
+skinparam rectangle {
+  BackgroundColor<<system>> #EEEEFF
+  BorderColor<<system>> black
+  BorderThickness<<system>> 2
+  RoundCorner<<system>> 15
+}
 
 ' Menschen/Rollen im Umfeld
 actor "Spielende" as Spieler
@@ -13,13 +24,13 @@ actor "Community-Entwickelnde" as Dev
 actor "Betrieb / Support (Hersteller)" as Ops
 
 ' System im Fokus (Black Box)
-rectangle "Minecraft-Spielsystem\n(Launcher, Client, Server/Realms)" as System
+rectangle "\n\n    Minecraft-Spielsystem\n    (Launcher, Client, Server/Realms)    \n\n " as System <<system>>
 
 ' Externe, fachliche Nachbarsysteme (ohne Technik-Details)
 rectangle "Zahlungsdienstleister / Store\n(Microsoft Commerce)" as Commerce
 rectangle "Identitaetsdienst\n(Microsoft Account)" as Identity
 
-' Beziehungen auf Fach-/Organisations-Ebene (links  Mitte  rechts)
+' Beziehungen auf Fach-/Organisations-Ebene
 Spieler -right-> System : Spielen, Chatten,\nInhalte nutzen
 Dev -right-> System : Inhalte bereitstellen\n(Mods/Datapacks)
 Admin -right-> System : Mehrspieler verwalten,\nModeration/Konfiguration
