@@ -157,23 +157,51 @@ Damit ist der fachliche Kontext nachvollziehbar abgegrenzt; weniger relevante Na
 
 
 ### 3.2 Technischer Kontext (Technical Context)
-Das technische Kontextdiagramm betrachtet dieselben Kommunikationspartner, legt aber den Fokus auf die technischen Kanäle und Schnittstellen zwischen Minecraft und seiner Umgebung.
 
-Aus Sicht der Architektur werden insbesondere folgende technischen Verbindungen unterschieden:
+Das technische Kontextdiagramm zeigt das Minecraft-Spielsystem
+(Launcher, Client, Server/Realms) als Blackbox und beschreibt die
+technischen Kanäle zu seinen Nachbarsystemen und Infrastrukturknoten.
 
-- Spiel-Clients (PC, Konsole, Mobile) verbinden sich über das Internet mittels eines Minecraft-Game-Protokolls (TCP/UDP) mit dem Server.
-- Server-Administrationen greifen über Management-Kanäle wie Remote-Konsole, SSH oder Web-Adminoberflächen auf das System zu.
-- Der Identitätsdienst „Microsoft Account“ wird über HTTPS-basierte Web-APIs angesprochen (Anmeldung, Token-Validierung, Lizenzabfragen).
-- Der Zahlungsdienstleister / Store „Microsoft Commerce“ wird ebenfalls über HTTPS-APIs eingebunden (Zahlungsabwicklung, Entitlement-Abfragen).
+Aus Sicht der Architektur werden insbesondere folgende technische
+Verbindungen unterschieden:
+
+- **Endgeräte (Desktop, Konsole, Mobilgerät)** verbinden sich über das
+  Internet mittels eines Minecraft-Game-Protokolls (TCP/IP) mit dem
+  Minecraft-Spielsystem, um Spielaktionen, Welt-Updates und Chat
+  auszutauschen.
+- Das Minecraft-Spielsystem kommuniziert mit dem **Identitätsdienst
+  „Microsoft Account“** über HTTPS-basierte Web-APIs für Anmeldung,
+  Token-Validierung und Lizenzabfragen.
+- Der **Zahlungsdienstleister / Store „Microsoft Commerce“** wird
+  ebenfalls per HTTPS angesprochen, um Käufe und Abos abzuwickeln und
+  Entitlements (Lizenzen) zu verwalten.
+- Das Minecraft-Spielsystem wird entweder auf einem **eigenen
+  Server-System (Hardware/OS)** als „Minecraft Server (Java)“ oder als
+  **Realms-Server (Java/Bedrock)** in der Cloud („Minecraft Realms“) 
+  deployt.
+- Persistente Daten werden über Filesystem-Zugriffe auf **World & Player
+  Storage (Filesystem: NBT/Anvil .mca)**, über Datenbankzugriffe auf die
+  **Plugin-DB (SQLite/MySQL/PostgreSQL)** sowie über die Cloud-Persistenz
+  **Managed Storage (Realms-Cloud)** gehalten.
+- Eine **Modding-Plattform (Forge/Fabric)** auf dem Desktop-PC erzeugt
+  Plugins und Mods, die über einen Deployment-Kanal in den
+  „Minecraft Server (Java)“ übernommen werden.
 
 ##### Kurzbeschreibung der technischen Schnittstellen
 
-| Technischer Kanal / Schnittstelle          | Beteiligte Systeme / Partner                                           | Zweck (zugehörige fachliche Flüsse)                                                          |
-|-------------------------------------------|------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
-| Game-Protokoll über Internet (TCP/UDP)    | Spiel-Client der Spielenden ↔ Minecraft-Server                         | Übertragung der Spielaktionen und Welt-Updates, Chat-Nachrichten, Mehrspieler-Synchronisation |
-| Admin-/Management-Zugänge (z. B. RCON, SSH, Web-Admin) | Server-Administrationen / Hoster ↔ Minecraft-Server                  | Verwaltung der Server-Konfiguration, Logs, Moderations- und Betriebsaktionen                  |
-| HTTPS-API „Microsoft Account“             | Minecraft-Server ↔ Identitätsdienst (Microsoft Account)                | Anmeldung der Spielenden, Validierung von Konten und Lizenzen („Konten & Lizenzen (Anmeldung)“) |
-| HTTPS-API „Microsoft Commerce“            | Minecraft-Server ↔ Zahlungsdienstleister / Store (Microsoft Commerce)  | Abwicklung von Käufen und Abos, Verwaltung der Entitlements („Zahlungsabwicklung (Käufe, Abos)“) |
+| Technischer Kanal / Schnittstelle              | Beteiligte Systeme / Partner                                                | Zweck (zugehörige fachliche Flüsse)                                                                           |
+|-----------------------------------------------|-----------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|
+| Game-Protokoll über Internet (TCP/IP)         | Endgeräte (Desktop, Konsole, Mobilgerät) ↔ Minecraft-Spielsystem           | Übertragung von Spielaktionen, Welt-Updates und Chat-Nachrichten („Spielen, Chatten, Inhalte nutzen“)         |
+| HTTPS-API „Microsoft Account“                 | Minecraft-Spielsystem ↔ Identitaetsdienst (Microsoft Account)              | Anmeldung der Spielenden, Token-Validierung und Abruf von Konten-/Lizenzinformationen („Konten & Lizenzen“)    |
+| HTTPS-API „Microsoft Commerce“                | Minecraft-Spielsystem ↔ Zahlungsdienstleister / Store (Microsoft Commerce) | Abwicklung von Käufen und Abos, Verwaltung von Entitlements („Zahlungsabwicklung (Käufe, Abos)“)              |
+| Deployment „Minecraft Server (Java)“          | Minecraft-Spielsystem ↔ Eigenes Server-System (Hardware/OS)                | Bereitstellung und Betrieb eines dedizierten Minecraft-Servers für Multiplayer-Szenarien                      |
+| Deployment „Realms-Server (Java/Bedrock)“     | Minecraft-Spielsystem ↔ Minecraft Realms (Cloud)                            | Bereitstellung verwalteter Realms-Server als Cloud-Service                                                     |
+| Filesystem-Zugriff „World & Player Storage“   | Minecraft-Spielsystem ↔ World & Player Storage (Filesystem: NBT/Anvil .mca)| Persistente Speicherung von Welt- und Spieler-Daten                                                            |
+| DB-Zugriff „Plugin-DB“                        | Minecraft-Spielsystem ↔ Plugin-DB (SQLite/MySQL/PostgreSQL)                | Verwaltung von Plugin-Daten (Konfiguration, Zustände), optional abhängig vom eingesetzten Server-Framework    |
+| Persistenz „Managed Storage (Realms-Cloud)“   | Minecraft-Spielsystem ↔ Managed Storage (Realms-Cloud)                      | Persistente Speicherung von Realms-Welten und Spieler-Daten im Cloud-Speicher                                  |
+| Plugins/Mods Deployment                       | Modding-Plattform (Forge/Fabric) ↔ Minecraft-Spielsystem                   | Aufbau und Deployment von Mods/Plugins, die auf dem dedizierten Minecraft-Server (Java) ausgeführt werden     |
+
+![Technisches-Kontextdiagramm - Minecraft-Referenzarchitektur](diagrams/technischer_kontext.svg)
 
 ---
 
